@@ -1,0 +1,7 @@
+{
+  "name": "Veritas AI - Forensics & Fact-Checking",
+  "description": "Advanced AI forensics and information authentication tool using Gemini 3 Pro and Live API.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
