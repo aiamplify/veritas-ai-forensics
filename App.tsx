@@ -60,13 +60,13 @@ const App: React.FC = () => {
     setUrlInput(item.input);
 
     if (item.type === 'video' || item.type === 'image') {
-      setResult(item.result as AnalysisResult);
+      setResult(item.result as unknown as AnalysisResult);
     } else if (item.type === 'fact-check') {
-      setTruthResult(item.result as FactCheckResult);
+      setTruthResult(item.result as unknown as FactCheckResult);
     } else if (item.type === 'script') {
-      setScriptResult(item.result as ScriptOriginResult);
+      setScriptResult(item.result as unknown as ScriptOriginResult);
     } else if (item.type === 'trust') {
-      setTrustResult(item.result as TrustAnalysisResult);
+      setTrustResult(item.result as unknown as TrustAnalysisResult);
     }
   };
 
@@ -82,16 +82,16 @@ const App: React.FC = () => {
         if (!urlInput) return;
         const data = await analyzeTrust(urlInput);
         setTrustResult(data);
-        if (user) saveAnalysis('trust', urlInput, data as Record<string, unknown>);
+        if (user) saveAnalysis('trust', urlInput, data as unknown as Record<string, unknown>);
       } else if (activeTab === 'script') {
         if (!urlInput) return;
         const data = await checkScriptOrigin(urlInput, videoTitleInput, channelNameInput);
         setScriptResult(data);
-        if (user) saveAnalysis('script', urlInput, data as Record<string, unknown>);
+        if (user) saveAnalysis('script', urlInput, data as unknown as Record<string, unknown>);
       } else if (activeTab === 'truth') {
         const data = await authenticateInformation(urlInput || textInput, urlInput ? 'url' : 'text');
         setTruthResult(data);
-        if (user) saveAnalysis('fact-check', urlInput || textInput, data as Record<string, unknown>);
+        if (user) saveAnalysis('fact-check', urlInput || textInput, data as unknown as Record<string, unknown>);
       } else {
         let inputData = '';
         let type: 'url' | 'image' = 'url';
@@ -107,7 +107,7 @@ const App: React.FC = () => {
         }
         const data = await analyzeMedia(inputData, type, analysisMode);
         setResult(data);
-        if (user) saveAnalysis(activeTab, inputForHistory, data as Record<string, unknown>);
+        if (user) saveAnalysis(activeTab, inputForHistory, data as unknown as Record<string, unknown>);
       }
     } catch (err) {
       console.error(err);
