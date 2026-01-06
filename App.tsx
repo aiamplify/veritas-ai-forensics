@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { AnalysisResult, AnalysisMode, FactCheckResult, ScriptOriginResult, TrustAnalysisResult } from './types';
-import { analyzeMedia, authenticateInformation, checkScriptOrigin, analyzeTrust, saveAnalysis } from './src/services/api';
-import { useAuth } from './src/contexts/AuthContext';
-import AuthButton from './src/components/AuthButton';
-import HistorySidebar from './src/components/HistorySidebar';
+import { analyzeMedia, authenticateInformation, checkScriptOrigin, analyzeTrust } from './src/services/api';
 import LiveVoiceAgent from './components/LiveVoiceAgent';
 import ChatInterface from './components/ChatInterface';
 import FactCheckDashboard from './components/FactCheckDashboard';
@@ -12,7 +9,6 @@ import TrustAnalysisDashboard from './components/TrustAnalysisDashboard';
 import TimelineVisualizer from './components/TimelineVisualizer';
 
 const App: React.FC = () => {
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'video' | 'image' | 'truth' | 'script' | 'trust'>('video');
   const [urlInput, setUrlInput] = useState('');
   const [textInput, setTextInput] = useState('');
@@ -54,44 +50,22 @@ const App: React.FC = () => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const handleSelectFromHistory = (item: { type: string; input: string; result: Record<string, unknown> }) => {
-    resetResults();
-    setActiveTab(item.type === 'fact-check' ? 'truth' : item.type as typeof activeTab);
-    setUrlInput(item.input);
-
-    if (item.type === 'video' || item.type === 'image') {
-      setResult(item.result as unknown as AnalysisResult);
-    } else if (item.type === 'fact-check') {
-      setTruthResult(item.result as unknown as FactCheckResult);
-    } else if (item.type === 'script') {
-      setScriptResult(item.result as unknown as ScriptOriginResult);
-    } else if (item.type === 'trust') {
-      setTrustResult(item.result as unknown as TrustAnalysisResult);
-    }
-  };
-
   const handleAnalyze = async () => {
     setIsAnalyzing(true);
     resetResults();
 
     try {
-      let analysisType = activeTab === 'truth' ? 'fact-check' : activeTab;
-      let inputForHistory = urlInput || textInput;
-
       if (activeTab === 'trust') {
         if (!urlInput) return;
         const data = await analyzeTrust(urlInput);
         setTrustResult(data);
-        if (user) saveAnalysis('trust', urlInput, data as unknown as Record<string, unknown>);
       } else if (activeTab === 'script') {
         if (!urlInput) return;
         const data = await checkScriptOrigin(urlInput, videoTitleInput, channelNameInput);
         setScriptResult(data);
-        if (user) saveAnalysis('script', urlInput, data as unknown as Record<string, unknown>);
       } else if (activeTab === 'truth') {
         const data = await authenticateInformation(urlInput || textInput, urlInput ? 'url' : 'text');
         setTruthResult(data);
-        if (user) saveAnalysis('fact-check', urlInput || textInput, data as unknown as Record<string, unknown>);
       } else {
         let inputData = '';
         let type: 'url' | 'image' = 'url';
@@ -103,11 +77,9 @@ const App: React.FC = () => {
           if (!imagePreview) return;
           inputData = imagePreview.split(',')[1];
           type = 'image';
-          inputForHistory = 'Image Upload';
         }
         const data = await analyzeMedia(inputData, type, analysisMode);
         setResult(data);
-        if (user) saveAnalysis(activeTab, inputForHistory, data as unknown as Record<string, unknown>);
       }
     } catch (err) {
       console.error(err);
@@ -119,9 +91,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen text-slate-200 p-4 md:p-8">
-      {/* History Sidebar */}
-      <HistorySidebar onSelectAnalysis={handleSelectFromHistory} />
-
       {/* Header Section */}
       <header className="max-w-7xl mx-auto mb-12 flex flex-col md:flex-row justify-between items-end gap-6 border-b border-slate-800/50 pb-8">
         <div>
@@ -156,7 +125,6 @@ const App: React.FC = () => {
                </span>
             </div>
           )}
-          <AuthButton />
         </div>
       </header>
 
