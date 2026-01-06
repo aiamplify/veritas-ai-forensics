@@ -77,7 +77,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Missing URL' });
     }
 
-    const modelName = 'gemini-2.5-pro-preview-06-05';
+    const modelName = 'gemini-3-pro-preview';
     const config: Record<string, unknown> = {
       responseMimeType: "application/json",
       responseSchema: scriptOriginSchema,

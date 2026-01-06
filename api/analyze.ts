@@ -80,8 +80,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Use more powerful model for thorough analysis
-    const modelName = mode === 'DEEP' ? 'gemini-2.5-pro-preview-06-05' : 'gemini-2.5-flash-preview-05-20';
+    // Use Gemini 3 Pro Preview for all analysis
+    const modelName = 'gemini-3-pro-preview';
     const config: Record<string, unknown> = {
       responseMimeType: "application/json",
       responseSchema: analysisSchema

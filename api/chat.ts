@@ -77,7 +77,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const fullSystemInstruction = VERITAS_SYSTEM_INSTRUCTION + contextAddendum;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro-preview-06-05',
+      model: 'gemini-3-pro-preview',
       contents: [
         ...(history || []).map((h: { role: string; text: string }) => ({
           role: h.role === 'user' ? 'user' : 'model',
